@@ -1,7 +1,7 @@
 '''
 CS5250 Assignment 4, Scheduling policies simulator
 Sample skeleton program
-Author: Minh Ho
+Author: Minh Ho , Amarjeet Singh
 Input file:
     input.txt
 Output files:
@@ -49,7 +49,41 @@ def FCFS_scheduling(process_list):
 #Output_1 : Schedule list contains pairs of (time_stamp, proccess_id) indicating the time switching to that proccess_id
 #Output_2 : Average Waiting Time
 def RR_scheduling(process_list, time_quantum ):
-    return (["to be completed, scheduling process_list on round robin policy with time_quantum"], 0.0)
+    n = float(len(process_list))
+    rem = n
+    remTime =[]	
+    schedule = []
+    current_time = 0
+    waiting_time = 0
+    count = 0	
+    flag = 0
+    #temporary array to stre remaining time		
+    for process in process_list:
+        remTime.append(process.burst_time)
+    	
+    while rem != 0 :
+        if(remTime[count] <= time_quantum and remTime[count] > 0 ):
+            current_time += remTime[count]
+            remTime[count] = 0
+            flag = 1 # done with processing
+        elif (remTime[count] > 0 ):
+            remTime[count] -= time_quantum
+            current_time += time_quantum
+        schedule.append((current_time, process_list[count].id)) # append current time and process id
+        if (remTime[count] == 0 and flag == 1 ):  # check if process is completed then record the waiting time and set the flag to 0
+            rem = rem -1
+            waiting_time +=  (current_time - process_list[count].arrive_time - process_list[count].burst-time)
+            flag = 0
+        if (count == n-1):
+            count = 0
+        elif (process_list[count+1].arrive_time <= current_time):
+            count =  count + 1
+        else :
+            count=0
+    average_waiting_time = waiting_time/n
+    return schedule, average_waiting_time		
+		    			
+   # return (["to be completed, scheduling process_list on round robin policy with time_quantum"], 0.0)
 
 def SRTF_scheduling(process_list):
     return (["to be completed, scheduling process_list on SRTF, using process.burst_time to calculate the remaining time of the current process "], 0.0)
@@ -94,4 +128,4 @@ def main(argv):
     write_output('SJF.txt', SJF_schedule, SJF_avg_waiting_time )
 
 if __name__ == '__main__':
-main(sys.argv[1:])
+	main(sys.argv[1:])
