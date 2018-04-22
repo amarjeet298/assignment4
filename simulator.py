@@ -63,22 +63,25 @@ def RR_scheduling(process_list, time_quantum ):
     processed = set(); # set which keeps track of process to counter idle time
     process_queue = [0]
     counter = 0
+    prev = counter
     while len(process_queue) != 0 :
         current = process_queue.pop(0)
         if(remTime[current] <= time_quantum and remTime[current] > 0 ):
-            schedule.append((current_time, process_list[current].id)) # append current time and process id
+            if (prev != current):
+                schedule.append((current_time, process_list[current].id)) # append current time and process id
             current_time += remTime[current]
             remTime[current] = 0
             flag = 1 # done with processing
             processed.add(current)
         elif (remTime[current] > 0 ):
-            schedule.append((current_time, process_list[current].id)) # append current time and process id
+            if (prev != current):
+                schedule.append((current_time, process_list[current].id)) # append current time and process id
             remTime[current] -= time_quantum
             current_time += time_quantum
         if (remTime[current] == 0 and flag == 1 ):  # check if process is completed then record the waiting time and set the flag to 0
             waiting_time +=  (current_time - process_list[current].arrive_time - process_list[current].burst_time)
             flag = 0
-        while(counter < n-1 and (process_list[counter+1].arrive_time < current_time) )  :
+        while(counter < n-1 and (process_list[counter+1].arrive_time <= current_time) )  :
             counter =  counter + 1
             process_queue.append(counter)
         if(remTime[current] > 0):
@@ -87,6 +90,7 @@ def RR_scheduling(process_list, time_quantum ):
             current_time = process_list[counter+1].arrive_time
             counter =  counter + 1
             process_queue.append(counter)
+        prev = current
     average_waiting_time = waiting_time/float(n)
     return schedule, average_waiting_time		
 
