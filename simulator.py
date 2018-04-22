@@ -50,49 +50,48 @@ def FCFS_scheduling(process_list):
 #Output_2 : Average Waiting Time
 def RR_scheduling(process_list, time_quantum ):
     n = len(process_list)
-    rem = n
     remTime =[]	
     schedule = []
     current_time = 0
     waiting_time = 0
-    count = 0	
+    current = 0
     flag = 0
     #temporary array to stre remaining time		
     for process in process_list:
         remTime.append(process.burst_time)
 
     processed = set(); # set which keeps track of process to counter idle time
-    while rem != 0 :
-        if(remTime[count] <= time_quantum and remTime[count] > 0 ):
-            schedule.append((current_time, process_list[count].id)) # append current time and process id
-            current_time += remTime[count]
-            remTime[count] = 0
+    process_queue = [0]
+    counter = 0
+    while len(process_queue) != 0 :
+        current = process_queue.pop(0)
+        if(remTime[current] <= time_quantum and remTime[current] > 0 ):
+            schedule.append((current_time, process_list[current].id)) # append current time and process id
+            current_time += remTime[current]
+            remTime[current] = 0
             flag = 1 # done with processing
-            processed.add(count)
-        elif (remTime[count] > 0 ):
-            schedule.append((current_time, process_list[count].id)) # append current time and process id
-            remTime[count] -= time_quantum
+            processed.add(current)
+        elif (remTime[current] > 0 ):
+            schedule.append((current_time, process_list[current].id)) # append current time and process id
+            remTime[current] -= time_quantum
             current_time += time_quantum
-        if (remTime[count] == 0 and flag == 1 ):  # check if process is completed then record the waiting time and set the flag to 0
-            rem = rem -1
-            waiting_time +=  (current_time - process_list[count].arrive_time - process_list[count].burst_time)
+        if (remTime[current] == 0 and flag == 1 ):  # check if process is completed then record the waiting time and set the flag to 0
+            waiting_time +=  (current_time - process_list[current].arrive_time - process_list[current].burst_time)
             flag = 0
-        if (count == n-1):
-            count = 0
-        elif (process_list[count+1].arrive_time <= current_time):
-            count =  count + 1
-        else :
-            if(len(processed) -1 == count ):
-                current_time = process_list[count+1].arrive_time
-                count = count +1
-            else:
-                count=0
+        while(counter < n-1 and (process_list[counter+1].arrive_time < current_time) )  :
+            counter =  counter + 1
+            process_queue.append(counter)
+        if(remTime[current] > 0):
+            process_queue.append(current)
+        if((len(processed) -1) == counter and len(processed) != n ):
+            current_time = process_list[counter+1].arrive_time
+            counter =  counter + 1
+            process_queue.append(counter)
     average_waiting_time = waiting_time/float(n)
     return schedule, average_waiting_time		
-		    			
-   # return (["to be completed, scheduling process_list on round robin policy with time_quantum"], 0.0)
 
 def SRTF_scheduling(process_list):
+
     return (["to be completed, scheduling process_list on SRTF, using process.burst_time to calculate the remaining time of the current process "], 0.0)
 
 def SJF_scheduling(process_list, alpha):
@@ -125,7 +124,7 @@ def main(argv):
     FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
     write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
     print ("simulating RR ----")
-    RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 2)
+    RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 4)
     write_output('RR.txt', RR_schedule, RR_avg_waiting_time )
     print ("simulating SRTF ----")
     SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
