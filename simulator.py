@@ -54,7 +54,6 @@ def RR_scheduling(process_list, time_quantum ):
     schedule = []
     current_time = 0
     waiting_time = 0
-    current = 0
     flag = 0
     #temporary array to stre remaining time		
     for process in process_list:
@@ -95,8 +94,48 @@ def RR_scheduling(process_list, time_quantum ):
     return schedule, average_waiting_time		
 
 def SRTF_scheduling(process_list):
+    n = len(process_list)
+    remTime =[]
+    schedule = []
+    current_time = 0
+    waiting_time = 0
+    flag = 0
+    completed = 0
+    minT =  999
+    prev = 999
+    #temporary array to stre remaining time
+    for process in process_list:
+        remTime.append(process.burst_time)
 
-    return (["to be completed, scheduling process_list on SRTF, using process.burst_time to calculate the remaining time of the current process "], 0.0)
+    while (completed != n):
+        for j in range(n)  :
+            if((process_list[j].arrive_time <= current_time )and remTime[j] <= minT and remTime[j] > 0) :
+                minT = remTime[j]
+                shortest = j
+                flag = 1;
+
+        if(flag ==0 ):
+            current_time = current_time +1
+            continue
+        if (prev != shortest):
+            schedule.append((current_time, process_list[shortest].id))
+
+        remTime[shortest] = remTime[shortest] -1
+        minT = remTime[shortest]
+        current_time = current_time +1
+        if(minT ==0 ):
+            minT = 999
+
+        if(remTime[shortest] == 0):
+            completed = completed +1
+            wt=  (current_time - process_list[shortest].arrive_time - process_list[shortest].burst_time)
+            if(wt< 0 ):
+                wt = 0
+            waiting_time = waiting_time + wt
+            flag = 0
+        prev = shortest
+    average_waiting_time = waiting_time/float(n)
+    return schedule, average_waiting_time
 
 def SJF_scheduling(process_list, alpha):
     return (["to be completed, scheduling SJF without using information from process.burst_time"],0.0)
