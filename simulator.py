@@ -137,8 +137,60 @@ def SRTF_scheduling(process_list):
     average_waiting_time = waiting_time/float(n)
     return schedule, average_waiting_time
 
+
+def short(process_queue, prediction):
+    pass
+
+
 def SJF_scheduling(process_list, alpha):
-    return (["to be completed, scheduling SJF without using information from process.burst_time"],0.0)
+    n = len(process_list)
+    remTime =[]
+    schedule = []
+    current_time = 0
+    waiting_time = 0
+    flag = 0
+
+    #temporary array to stre remaining time
+    for process in process_list:
+        remTime.append(process.burst_time)
+
+    processed = set(); # set which keeps track of process to counter idle time
+    process_queue = [0] # start with first process
+    counter = 0
+    prev = counter
+    prediction = {0:5, 1:5, 2:5, 3:5}
+    completed = 0
+    while (completed != n):
+        #first guess is 5 time unit for all the process
+        current = process_queue.pop(0)
+        #allow it to run for actual duration as process is non pre-emptive
+        remTime[current]=0
+        schedule.append((current_time, process_list[current].id))
+        current_time =current_time + process_list[current].burst_time
+        completed = completed +1
+        processed.add(current)
+        wt=  (current_time - process_list[current].arrive_time - process_list[current].burst_time)
+        if(wt< 0 ):
+            wt = 0
+        waiting_time = waiting_time + wt
+        # calculate next burst time for this process
+        next_burst = alpha * process_list[current].burst_time + (1- alpha) * prediction[process_list[current].id]
+        prediction[current] =  next_burst;
+        # check how many process has arrived by this time - add them to process queue
+        while(counter < n-1 and (process_list[counter+1].arrive_time <= current_time) )  :
+            counter =  counter + 1
+            process_queue.append(counter)
+        if((len(processed) -1) == counter and len(processed) != n ):
+            current_time = process_list[counter+1].arrive_time
+            counter =  counter + 1
+            process_queue.append(counter)
+        #short the process based on their predictd burst time
+        short(process_queue, prediction)
+    average_waiting_time = waiting_time/float(n)
+    return schedule, average_waiting_time
+
+
+   # return (["to be completed, scheduling SJF without using information from process.burst_time"],0.0)
 
 
 def read_input():
