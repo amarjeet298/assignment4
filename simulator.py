@@ -184,14 +184,13 @@ def SJF_scheduling(process_list, alpha):
             current_time = process_list[counter+1].arrive_time
             counter =  counter + 1
             process_queue.append(counter)
-        #short the process based on their predictd burst time
+        #short the process based on their predictd burst time for scheduling purpose
         short(process_queue, prediction)
     average_waiting_time = waiting_time/float(n)
     return schedule, average_waiting_time
 
 
    # return (["to be completed, scheduling SJF without using information from process.burst_time"],0.0)
-
 
 def read_input():
     result = []
