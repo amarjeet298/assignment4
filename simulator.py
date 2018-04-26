@@ -62,7 +62,7 @@ def RR_scheduling(process_list, time_quantum ):
     processed = set(); # set which keeps track of process to counter idle time
     process_queue = [0]
     counter = 0
-    prev = counter
+    prev = 9999
     while len(process_queue) != 0 :
         current = process_queue.pop(0)
         if(remTime[current] <= time_quantum and remTime[current] > 0 ):
@@ -78,7 +78,10 @@ def RR_scheduling(process_list, time_quantum ):
             remTime[current] -= time_quantum
             current_time += time_quantum
         if (remTime[current] == 0 and flag == 1 ):  # check if process is completed then record the waiting time and set the flag to 0
-            waiting_time +=  (current_time - process_list[current].arrive_time - process_list[current].burst_time)
+            wt = current_time - process_list[current].arrive_time - process_list[current].burst_time;
+            if(wt < 0):
+                wt = 0
+            waiting_time +=  wt
             flag = 0
         while(counter < n-1 and (process_list[counter+1].arrive_time <= current_time) )  :
             counter =  counter + 1
@@ -212,7 +215,7 @@ def main(argv):
     FCFS_schedule, FCFS_avg_waiting_time =  FCFS_scheduling(process_list)
     write_output('FCFS.txt', FCFS_schedule, FCFS_avg_waiting_time )
     print ("simulating RR ----")
-    RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 4)
+    RR_schedule, RR_avg_waiting_time =  RR_scheduling(process_list,time_quantum = 5)
     write_output('RR.txt', RR_schedule, RR_avg_waiting_time )
     print ("simulating SRTF ----")
     SRTF_schedule, SRTF_avg_waiting_time =  SRTF_scheduling(process_list)
